@@ -29,3 +29,9 @@ English-first, bilingual (English/Persian) static website for the 9th Annual Ard
 
 
 The homepage navigation includes **Sign in** and **Register** links to `auth.html`. Configure `supabase-config.js` before deployment.
+
+
+## Bilingual language behavior
+- Persian (RTL) is the default on the homepage and authentication page.
+- The language switch toggles English/Persian and stores the choice in browser local storage, so it persists across pages on the same site.
+- Keep your existing working `supabase-config.js`; do not replace it with a template. Never commit a secret/service-role key.
