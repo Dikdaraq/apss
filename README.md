@@ -18,3 +18,13 @@ This update adds `submissions.html` and `submissions.js` for authenticated parti
 
 ## Important security note
 The form checks file extension and size in the browser; this is not content-level file validation. Bucket MIME restrictions and Storage RLS are also required. The portal does not yet provide an administrator dashboard, document review workflow, or virus scanning. Do not publish secret keys or submitted documents in the GitHub repository.
+
+
+## Administrator dashboard (new)
+1. Upload `admin.html`, `admin.js`, and `admin_setup.sql` to the repository root. Keep your existing `supabase-config.js` unchanged.
+2. In Supabase SQL Editor, run the contents of `admin_setup.sql` once. This creates a separate `apss_admins` allowlist and policies; it does not disable RLS or expose the table publicly.
+3. Register the organizer account using the normal website registration flow and confirm the email. In Supabase Dashboard → Authentication → Users, copy that account's UUID.
+4. In SQL Editor, run `insert into public.apss_admins (user_id) values ('PASTE-USER-UUID-HERE');` after replacing the placeholder with the organizer's actual UUID. Do not add participant accounts.
+5. Sign in with that organizer account, then visit `https://dikdaraq.github.io/apss/admin.html`.
+
+The dashboard uses short-lived signed links (60 seconds) for private documents. It allows admins to update submission status only. Never place a Supabase secret/service-role key in browser code. Test with a separate organizer account before production use.
