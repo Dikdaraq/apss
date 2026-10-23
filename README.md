@@ -26,3 +26,6 @@ English-first, bilingual (English/Persian) static website for the 9th Annual Ard
 - In Supabase Authentication URL Configuration, set the Site URL to `https://dikdaraq.github.io/apss/` and add `https://dikdaraq.github.io/apss/auth.html` to Redirect URLs. Adjust if your GitHub Pages URL differs.
 - Email confirmation must be enabled if you want users to verify their addresses. Test with a test account before announcing registration.
 - Authentication only is implemented in this step. Submission records, actual document upload, and the admin dashboard are not yet implemented. Do not accept real submissions until the complete flow and access policies have been tested.
+
+
+The homepage navigation includes **Sign in** and **Register** links to `auth.html`. Configure `supabase-config.js` before deployment.
