@@ -55,7 +55,7 @@
         const {data,error}=await client.auth.signUp({email,password,options:{emailRedirectTo,data:{full_name:fullName,institution}}});
         if(error)throw error;
         if(data.session)showStatus(w.created);else{showStatus(w.verify);form.reset();}
-      } else {const {error}=await client.auth.signInWithPassword({email,password});if(error)throw error;showStatus(w.signed);}
+      } else {const {error}=await client.auth.signInWithPassword({email,password});if(error)throw error;window.location.href="submissions.html";return;}
     } catch(error){showStatus(error.message||w.failed,"error");}
     finally{button.disabled=false;button.textContent=mode==="register"?words[language].createButton:words[language].loginButton;}
   });

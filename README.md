@@ -1,37 +1,20 @@
-# APSS 2026 — Seminar Website
+# APSS 9 website — submission portal update
 
-English-first, bilingual (English/Persian) static website for the 9th Annual Ardabil Pharmaceutical Sciences Seminar.
+This update adds `submissions.html` and `submissions.js` for authenticated participants to submit **multiple abstracts** from one account. The portal accepts PDF, PNG, DOC, and DOCX files, with a 10 MB frontend limit per file, and lists the current user's own submissions.
 
-## Files
-- `index.html` — page content and structure
-- `style.css` — responsive visual design
-- `script.js` — language toggle and mobile navigation
+## Deploy
+1. Upload the updated files in this folder to the root of your `Dikdaraq/apss` GitHub repository.
+2. Keep your existing, working `supabase-config.js` file unchanged. It must define `window.APSS_SUPABASE_URL` and `window.APSS_SUPABASE_PUBLISHABLE_KEY`. Never use a Supabase secret/service-role key in browser files.
+3. Commit the changes to `main` and wait for GitHub Pages to deploy.
+4. In Supabase Authentication → URL Configuration, ensure your GitHub Pages site URL and `auth.html` redirect URL are configured.
+5. Test with a test account before accepting real submissions.
 
-## Publish on GitHub Pages
-1. Open your GitHub repository.
-2. Upload these files to the repository root (the same level as `README.md`).
-3. Commit the changes to the `main` branch.
-4. In **Settings → Pages**, choose **Deploy from a branch**, select `main`, and select `/(root)`.
-5. Visit the published GitHub Pages URL after deployment completes.
+## Supabase requirements
+- Bucket named `apss-documents`, set to **private**.
+- Bucket allowed MIME types: `application/pdf`, `image/png`, `application/msword`, `application/vnd.openxmlformats-officedocument.wordprocessingml.document`.
+- Existing database tables: `public.profiles` and `public.submissions` as created in the setup steps.
+- Existing Storage policies must allow an authenticated user to upload into a first-level folder equal to their Auth user UUID and read only their own folder.
+- The `submissions` table must allow a user to insert rows only where `user_id = auth.uid()` and select only their own rows.
 
-## Important
-- The current contact button opens an email draft; it does **not** upload PDF files.
-- The submission portal, authentication, private file storage, and administrator dashboard must be configured separately before collecting submissions.
-- The scientific topics and dates are draft content. Confirm all details with the seminar organizing committee before public launch.
-- Do not commit participant data, uploaded PDFs, API secrets, or administrator credentials to this public repository.
-
-## Email authentication setup (new)
-- `auth.html` and `auth.js` provide a basic email registration/sign-in page.
-- `supabase-config.js` contains placeholders for the Supabase Project URL and **publishable** key. Fill them in locally before committing. A publishable key is intended for browser use; never use an `sb_secret_` or `service_role` key here.
-- In Supabase Authentication URL Configuration, set the Site URL to `https://dikdaraq.github.io/apss/` and add `https://dikdaraq.github.io/apss/auth.html` to Redirect URLs. Adjust if your GitHub Pages URL differs.
-- Email confirmation must be enabled if you want users to verify their addresses. Test with a test account before announcing registration.
-- Authentication only is implemented in this step. Submission records, actual document upload, and the admin dashboard are not yet implemented. Do not accept real submissions until the complete flow and access policies have been tested.
-
-
-The homepage navigation includes **Sign in** and **Register** links to `auth.html`. Configure `supabase-config.js` before deployment.
-
-
-## Bilingual language behavior
-- Persian (RTL) is the default on the homepage and authentication page.
-- The language switch toggles English/Persian and stores the choice in browser local storage, so it persists across pages on the same site.
-- Keep your existing working `supabase-config.js`; do not replace it with a template. Never commit a secret/service-role key.
+## Important security note
+The form checks file extension and size in the browser; this is not content-level file validation. Bucket MIME restrictions and Storage RLS are also required. The portal does not yet provide an administrator dashboard, document review workflow, or virus scanning. Do not publish secret keys or submitted documents in the GitHub repository.
