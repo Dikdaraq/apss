@@ -1,30 +1,41 @@
-# APSS 9 website — submission portal update
+# APSS 9 — complete website package
 
-This update adds `submissions.html` and `submissions.js` for authenticated participants to submit **multiple abstracts** from one account. The portal accepts PDF, PNG, DOC, and DOCX files, with a 10 MB frontend limit per file, and lists the current user's own submissions.
+This package contains the public seminar homepage, email authentication, participant submission portal, private document storage integration, and organizer dashboard.
 
-## Deploy
-1. Upload the updated files in this folder to the root of your `Dikdaraq/apss` GitHub repository.
-2. Keep your existing, working `supabase-config.js` file unchanged. It must define `window.APSS_SUPABASE_URL` and `window.APSS_SUPABASE_PUBLISHABLE_KEY`. Never use a Supabase secret/service-role key in browser files.
-3. Commit the changes to `main` and wait for GitHub Pages to deploy.
-4. In Supabase Authentication → URL Configuration, ensure your GitHub Pages site URL and `auth.html` redirect URL are configured.
-5. Test with a test account before accepting real submissions.
+## Included features
+- Persian-first, RTL interface with Persian/English language toggle.
+- Email-only registration and sign-in through Supabase Auth.
+- Multiple submissions per participant account.
+- Required title, authors, scientific field, and **3–7 keywords** per submission.
+- Abstract and poster uploads (PDF, PNG, DOC, DOCX; 10 MB maximum per file).
+- Automatic UTF-8 `keywords.txt` creation for every submission, stored beside its abstract and poster in the private `apss-documents` bucket.
+- Participant view of their own submissions.
+- Admin allowlist and review dashboard with short-lived signed download links for abstract, poster, and keywords files.
 
-## Supabase requirements
-- Bucket named `apss-documents`, set to **private**.
-- Bucket allowed MIME types: `application/pdf`, `image/png`, `application/msword`, `application/vnd.openxmlformats-officedocument.wordprocessingml.document`.
-- Existing database tables: `public.profiles` and `public.submissions` as created in the setup steps.
-- Existing Storage policies must allow an authenticated user to upload into a first-level folder equal to their Auth user UUID and read only their own folder.
-- The `submissions` table must allow a user to insert rows only where `user_id = auth.uid()` and select only their own rows.
+## Deploy to GitHub Pages
+1. Extract this ZIP and upload the contents of `apss_website_starter/` to the root of your `Dikdaraq/apss` repository.
+2. **Keep your existing working `supabase-config.js` unchanged.** It was not included in the uploaded ZIP, so this package includes `supabase-config.example.js` only as a template. If you do not already have the config in the repository, copy the example to `supabase-config.js` and enter your existing Supabase Project URL and publishable key. Never put a secret/service-role key in browser code.
+3. Run `keyword_migration.sql` once in Supabase SQL Editor before accepting submissions. This adds `keywords_file_path` to `public.submissions`.
+4. Your existing private bucket must remain named `apss-documents`. In Supabase Storage → `apss-documents` → Settings, add `text/plain` to the allowed MIME types (keep the existing PDF/PNG/DOC/DOCX types). The migration also updates the participant upload policy to allow `.txt` while preserving the UUID-folder restriction. Admin read access remains private; no public Storage policy is needed.
+5. The existing `admin_setup.sql` is included for reference. If the admin dashboard is already working, do not rerun or change the existing admin allowlist unnecessarily.
+6. Commit to `main`, wait for GitHub Pages to deploy, then test a complete submission using a participant account and download all three files using the organizer account.
 
-## Important security note
-The form checks file extension and size in the browser; this is not content-level file validation. Bucket MIME restrictions and Storage RLS are also required. The portal does not yet provide an administrator dashboard, document review workflow, or virus scanning. Do not publish secret keys or submitted documents in the GitHub repository.
+## Database change required
+The new database field is `public.submissions.keywords_file_path` (text, nullable for older submissions). The migration also adjusts the existing upload policy to allow `.txt` files in the same user-owned folder. The migration is idempotent and can be run safely more than once.
 
+## File layout in private Storage
+Each submission is stored under a unique folder:
 
-## Administrator dashboard (new)
-1. Upload `admin.html`, `admin.js`, and `admin_setup.sql` to the repository root. Keep your existing `supabase-config.js` unchanged.
-2. In Supabase SQL Editor, run the contents of `admin_setup.sql` once. This creates a separate `apss_admins` allowlist and policies; it does not disable RLS or expose the table publicly.
-3. Register the organizer account using the normal website registration flow and confirm the email. In Supabase Dashboard → Authentication → Users, copy that account's UUID.
-4. In SQL Editor, run `insert into public.apss_admins (user_id) values ('PASTE-USER-UUID-HERE');` after replacing the placeholder with the organizer's actual UUID. Do not add participant accounts.
-5. Sign in with that organizer account, then visit `https://dikdaraq.github.io/apss/admin.html`.
+`<auth-user-uuid>/submissions/<submission-uuid>/abstract-<random-name>.<ext>`
 
-The dashboard uses short-lived signed links (60 seconds) for private documents. It allows admins to update submission status only. Never place a Supabase secret/service-role key in browser code. Test with a separate organizer account before production use.
+`<auth-user-uuid>/submissions/<submission-uuid>/poster-<random-name>.<ext>`
+
+`<auth-user-uuid>/submissions/<submission-uuid>/keywords.txt`
+
+The text file is UTF-8 (with BOM for compatibility with common Windows text editors) and contains the submission title, authors, and one keyword per line.
+
+## Security
+- Keep `apss-documents` private.
+- Do not disable Row Level Security or add public read policies.
+- Do not expose Supabase secret/service-role keys.
+- The front-end extension and size checks are not malware/content scanning. Review uploaded files before opening them.
