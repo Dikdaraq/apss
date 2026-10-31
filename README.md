@@ -8,7 +8,7 @@ This package contains the public seminar homepage, email authentication, partici
 - Multiple submissions per participant account.
 - Required title, authors, scientific field, and **3–7 keywords** per submission.
 - Abstract and poster uploads (PDF, PNG, DOC, DOCX; 10 MB maximum per file).
-- Automatic UTF-8 `keywords.txt` creation for every submission, stored beside its abstract and poster in the private `apss-documents` bucket.
+- Automatic UTF-8 `keywords.txt` creation as a distinct `File` object for every submission, stored beside its abstract and poster in the private `apss-documents` bucket.
 - Participant view of their own submissions.
 - Admin allowlist and review dashboard with short-lived signed download links for abstract, poster, and keywords files.
 
@@ -39,3 +39,7 @@ The text file is UTF-8 (with BOM for compatibility with common Windows text edit
 - Do not disable Row Level Security or add public read policies.
 - Do not expose Supabase secret/service-role keys.
 - The front-end extension and size checks are not malware/content scanning. Review uploaded files before opening them.
+
+
+## Keyword upload correction
+The portal now creates an explicit browser `File` named `keywords.txt` with MIME type `text/plain`, verifies the Storage upload response, and uses a cache-busting script URL. Replace `submissions.js` and `submissions.html` on GitHub Pages (or deploy the full package) so the browser loads this corrected code.

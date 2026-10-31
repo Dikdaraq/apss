@@ -141,9 +141,22 @@
           ...keywords.map((keyword, i) => `${i + 1}. ${keyword}`),
           ''
         ].join('\n');
-        const keywordBlob = new Blob(['\uFEFF', keywordText], {type:'text/plain;charset=utf-8'});
-        const { error: keywordError } = await client.storage.from('apss-documents').upload(keywordsPath, keywordBlob, {contentType:'text/plain', upsert:false});
+        // Upload a real File object with an explicit .txt filename and MIME type.
+        // This keeps the keyword artifact distinct from the abstract and poster files.
+        const keywordFile = new File(['\uFEFF', keywordText], 'keywords.txt', {
+          type: 'text/plain'
+        });
+        const { data: keywordUpload, error: keywordError } = await client.storage
+          .from('apss-documents')
+          .upload(keywordsPath, keywordFile, {
+            contentType: 'text/plain',
+            upsert: false,
+            cacheControl: '3600'
+          });
         if (keywordError) throw keywordError;
+        if (!keywordUpload || keywordUpload.path !== keywordsPath) {
+          throw new Error('Keyword file upload could not be verified.');
+        }
         uploaded.push(keywordsPath);
 
         const { error: insertError } = await client.from('submissions').insert({
