@@ -43,3 +43,11 @@ The text file is UTF-8 (with BOM for compatibility with common Windows text edit
 
 ## Keyword upload correction
 The portal now creates an explicit browser `File` named `keywords.txt` with MIME type `text/plain`, verifies the Storage upload response, and uses a cache-busting script URL. Replace `submissions.js` and `submissions.html` on GitHub Pages (or deploy the full package) so the browser loads this corrected code.
+
+
+## Administrator deletion feature
+The administrator dashboard now has a Delete button for each submission. It asks for confirmation, deletes the submission row, then removes its abstract, poster, and keywords files from the private `apss-documents` bucket. Only accounts listed in `public.apss_admins` can perform these actions.
+
+For an existing Supabase setup, run `admin_delete_migration.sql` once in the Supabase SQL Editor. For a new setup, the equivalent policies are also included at the end of `admin_setup.sql`. Do not make the bucket public.
+
+Note: if the database row is deleted successfully but Storage reports a file-removal error, the dashboard reports that partial failure; the files may need manual cleanup in Storage.
