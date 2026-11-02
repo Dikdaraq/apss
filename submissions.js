@@ -53,8 +53,17 @@
     if (!file || file.size > 10 * 1024 * 1024) return false;
     return ['pdf','png','doc','docx'].includes(file.name.split('.').pop().toLowerCase());
   }
+  // Works on HTTP as well as HTTPS. crypto.randomUUID() is unavailable
+  // in some non-secure browser contexts (for example, plain HTTP).
+  function createUniqueId() {
+    if (window.crypto && typeof window.crypto.randomUUID === 'function') {
+      return window.crypto.randomUUID();
+    }
+    return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}-${Math.random().toString(36).slice(2)}`;
+  }
+
   function uniqueName(file) {
-    return `${crypto.randomUUID()}.${file.name.split('.').pop().toLowerCase()}`;
+    return `${createUniqueId()}.${file.name.split('.').pop().toLowerCase()}`;
   }
   function updateKeywordCount() {
     const count = parseKeywords($('keywords').value).length;
@@ -121,7 +130,7 @@
       if (!fileValid(abstractFile) || !fileValid(posterFile)) { showStatus(words[language].invalid, 'error'); return; }
 
       const btn = $('submitButton'); btn.disabled = true; showStatus(words[language].uploading);
-      const submissionId = crypto.randomUUID();
+      const submissionId = createUniqueId();
       const base = `${user.id}/submissions/${submissionId}`;
       const abstractPath = `${base}/abstract-${uniqueName(abstractFile)}`;
       const posterPath = `${base}/poster-${uniqueName(posterFile)}`;
