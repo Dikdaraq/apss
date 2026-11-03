@@ -10,7 +10,7 @@
       needLogin:'برای ارسال اثر ابتدا وارد حساب کاربری شوید.',
       loadError:'دریافت آثار با خطا روبه‌رو شد.', empty:'هنوز اثری ثبت نکرده‌اید.',
       uploading:'در حال بارگذاری فایل‌ها و ثبت اثر…', success:'اثر شما با موفقیت ثبت شد.',
-      failed:'ثبت اثر ناموفق بود: ', invalid:'هر دو فایل باید PDF، PNG، DOC یا DOCX و حداکثر ۱۰ مگابایت باشند.',
+      failed:'ثبت اثر ناموفق بود: ', invalid:'هر دو فایل باید PDF، PNG، DOC، DOCX، PPT یا PPTX و حداکثر ۱۰ مگابایت باشند.',
       badTitle:'عنوان، نام نویسندگان و محور علمی را کامل کنید.',
       badKeywords:'لطفاً بین ۳ تا ۷ کلیدواژه وارد کنید. کلیدواژه‌ها را با ویرگول یا در خط جداگانه بنویسید.',
       status:{submitted:'ثبت‌شده',under_review:'در حال بررسی',revision_requested:'نیازمند اصلاح',accepted:'پذیرفته‌شده',rejected:'ردشده'},
@@ -22,7 +22,7 @@
       needLogin:'Please sign in before submitting your work.', loadError:'Could not load your submissions.',
       empty:'You have not submitted any work yet.', uploading:'Uploading files and saving your submission…',
       success:'Your submission was saved successfully.', failed:'Submission failed: ',
-      invalid:'Both files must be PDF, PNG, DOC, or DOCX and no larger than 10 MB.',
+      invalid:'Both files must be PDF, PNG, DOC, DOCX, PPT, or PPTX and no larger than 10 MB.',
       badTitle:'Complete the title, authors, and scientific field.',
       badKeywords:'Enter 3–7 keywords, separated by commas or new lines.',
       status:{submitted:'Submitted',under_review:'Under review',revision_requested:'Revision requested',accepted:'Accepted',rejected:'Rejected'},
@@ -51,7 +51,7 @@
   }
   function fileValid(file) {
     if (!file || file.size > 10 * 1024 * 1024) return false;
-    return ['pdf','png','doc','docx'].includes(file.name.split('.').pop().toLowerCase());
+    return ['pdf','png','doc','docx','ppt','pptx'].includes(file.name.split('.').pop().toLowerCase());
   }
   // Works on HTTP as well as HTTPS. crypto.randomUUID() is unavailable
   // in some non-secure browser contexts (for example, plain HTTP).

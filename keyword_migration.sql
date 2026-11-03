@@ -10,12 +10,12 @@ alter table public.submissions
 -- No public bucket or public read policy is required.
 
 -- Permit the new .txt keyword file in the existing participant upload policy.
--- This preserves the same user-folder restriction and adds only the txt extension.
+-- This preserves the same user-folder restriction and allows keyword text and PowerPoint files.
 drop policy if exists "APSS users upload own documents" on storage.objects;
 create policy "APSS users upload own documents"
 on storage.objects for insert to authenticated
 with check (
   bucket_id = 'apss-documents'
   and (storage.foldername(name))[1] = (select auth.uid()::text)
-  and lower(storage.extension(name)) in ('pdf','png','doc','docx','txt')
+  and lower(storage.extension(name)) in ('pdf','png','doc','docx','ppt','pptx','txt')
 );

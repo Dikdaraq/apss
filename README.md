@@ -7,7 +7,7 @@ This package contains the public seminar homepage, email authentication, partici
 - Email-only registration and sign-in through Supabase Auth.
 - Multiple submissions per participant account.
 - Required title, authors, scientific field, and **3–7 keywords** per submission.
-- Abstract and poster uploads (PDF, PNG, DOC, DOCX; 10 MB maximum per file).
+- Abstract and poster uploads (PDF, PNG, DOC, DOCX, PPT, PPTX; 10 MB maximum per file).
 - Automatic UTF-8 `keywords.txt` creation as a distinct `File` object for every submission, stored beside its abstract and poster in the private `apss-documents` bucket.
 - Participant view of their own submissions.
 - Admin allowlist and review dashboard with short-lived signed download links for abstract, poster, and keywords files.
@@ -16,7 +16,7 @@ This package contains the public seminar homepage, email authentication, partici
 1. Extract this ZIP and upload the contents of `apss_website_starter/` to the root of your `Dikdaraq/apss` repository.
 2. **Keep your existing working `supabase-config.js` unchanged.** It was not included in the uploaded ZIP, so this package includes `supabase-config.example.js` only as a template. If you do not already have the config in the repository, copy the example to `supabase-config.js` and enter your existing Supabase Project URL and publishable key. Never put a secret/service-role key in browser code.
 3. Run `keyword_migration.sql` once in Supabase SQL Editor before accepting submissions. This adds `keywords_file_path` to `public.submissions`.
-4. Your existing private bucket must remain named `apss-documents`. In Supabase Storage → `apss-documents` → Settings, add `text/plain` to the allowed MIME types (keep the existing PDF/PNG/DOC/DOCX types). The migration also updates the participant upload policy to allow `.txt` while preserving the UUID-folder restriction. Admin read access remains private; no public Storage policy is needed.
+4. Your existing private bucket must remain named `apss-documents`. In Supabase Storage → `apss-documents` → Settings, add these MIME types to the allowed MIME types (keep existing types): `text/plain`, `application/vnd.ms-powerpoint`, and `application/vnd.openxmlformats-officedocument.presentationml.presentation`. The migration updates the participant upload policy to allow `.txt`, `.ppt`, and `.pptx` while preserving the UUID-folder restriction. Admin read access remains private; no public Storage policy is needed.
 5. The existing `admin_setup.sql` is included for reference. If the admin dashboard is already working, do not rerun or change the existing admin allowlist unnecessarily.
 6. Commit to `main`, wait for GitHub Pages to deploy, then test a complete submission using a participant account and download all three files using the organizer account.
 
@@ -51,3 +51,7 @@ The administrator dashboard now has a Delete button for each submission. It asks
 For an existing Supabase setup, run `admin_delete_migration.sql` once in the Supabase SQL Editor. For a new setup, the equivalent policies are also included at the end of `admin_setup.sql`. Do not make the bucket public.
 
 Note: if the database row is deleted successfully but Storage reports a file-removal error, the dashboard reports that partial failure; the files may need manual cleanup in Storage.
+
+
+## PowerPoint support
+The submission form accepts legacy PowerPoint `.ppt` and modern `.pptx` files (10 MB maximum per file). In Supabase Storage → `apss-documents` → Settings, add the MIME types `application/vnd.ms-powerpoint` and `application/vnd.openxmlformats-officedocument.presentationml.presentation`. Run the updated `keyword_migration.sql` once to update the participant upload extension policy.
