@@ -10,7 +10,7 @@
       needLogin:'برای ارسال اثر ابتدا وارد حساب کاربری شوید.',
       loadError:'دریافت آثار با خطا روبه‌رو شد.', empty:'هنوز اثری ثبت نکرده‌اید.',
       uploading:'در حال بارگذاری فایل‌ها و ثبت اثر…', success:'اثر شما با موفقیت ثبت شد.',
-      failed:'ثبت اثر ناموفق بود: ', invalid:'هر دو فایل باید PDF، PNG، DOC، DOCX، PPT یا PPTX و حداکثر ۱۰ مگابایت باشند.',
+      failed:'ثبت اثر ناموفق بود: ', invalid:'فایل چکیده الزامی است و فایل پوستر یا ارائه در صورت انتخاب باید PDF، PNG، DOC، DOCX، PPT یا PPTX و حداکثر ۱۰ مگابایت باشد.',
       badTitle:'عنوان، نام نویسندگان و محور علمی را کامل کنید.',
       badKeywords:'لطفاً بین ۳ تا ۷ کلیدواژه وارد کنید. کلیدواژه‌ها را با ویرگول یا در خط جداگانه بنویسید.',
       status:{submitted:'ثبت‌شده',under_review:'در حال بررسی',revision_requested:'نیازمند اصلاح',accepted:'پذیرفته‌شده',rejected:'ردشده'},
@@ -22,7 +22,7 @@
       needLogin:'Please sign in before submitting your work.', loadError:'Could not load your submissions.',
       empty:'You have not submitted any work yet.', uploading:'Uploading files and saving your submission…',
       success:'Your submission was saved successfully.', failed:'Submission failed: ',
-      invalid:'Both files must be PDF, PNG, DOC, DOCX, PPT, or PPTX and no larger than 10 MB.',
+      invalid:'The abstract file is required. If provided, the optional poster or presentation must be PDF, PNG, DOC, DOCX, PPT, or PPTX and no larger than 10 MB.',
       badTitle:'Complete the title, authors, and scientific field.',
       badKeywords:'Enter 3–7 keywords, separated by commas or new lines.',
       status:{submitted:'Submitted',under_review:'Under review',revision_requested:'Revision requested',accepted:'Accepted',rejected:'Rejected'},
@@ -123,21 +123,21 @@
       ev.preventDefault();
       if (!user) { showStatus(words[language].needLogin, 'error'); return; }
       const title = $('title').value.trim(), authors = $('authors').value.trim(), field = $('field').value;
-      const abstractFile = $('abstractFile').files[0], posterFile = $('posterFile').files[0];
+      const abstractFile = $('abstractFile').files[0], posterFile = $('posterFile').files[0] || null;
       const keywords = parseKeywords($('keywords').value);
       if (!title || !authors || !field) { showStatus(words[language].badTitle, 'error'); return; }
       if (keywords.length < 3 || keywords.length > 7) { showStatus(words[language].badKeywords, 'error'); $('keywords').focus(); return; }
-      if (!fileValid(abstractFile) || !fileValid(posterFile)) { showStatus(words[language].invalid, 'error'); return; }
+      if (!fileValid(abstractFile) || (posterFile && !fileValid(posterFile))) { showStatus(words[language].invalid, 'error'); return; }
 
       const btn = $('submitButton'); btn.disabled = true; showStatus(words[language].uploading);
       const submissionId = createUniqueId();
       const base = `${user.id}/submissions/${submissionId}`;
       const abstractPath = `${base}/abstract-${uniqueName(abstractFile)}`;
-      const posterPath = `${base}/poster-${uniqueName(posterFile)}`;
+      const posterPath = posterFile ? `${base}/poster-${uniqueName(posterFile)}` : null;
       const keywordsPath = `${base}/keywords.txt`;
       const uploaded = [];
       try {
-        for (const [file, path] of [[abstractFile, abstractPath], [posterFile, posterPath]]) {
+        for (const [file, path] of [[abstractFile, abstractPath], ...(posterFile ? [[posterFile, posterPath]] : [])]) {
           const { error } = await client.storage.from('apss-documents').upload(path, file, {contentType:file.type || undefined, upsert:false});
           if (error) throw error;
           uploaded.push(path);
