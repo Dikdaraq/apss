@@ -4,7 +4,8 @@ This package contains the public seminar homepage, email authentication, partici
 
 ## Included features
 - Persian-first, RTL interface with Persian/English language toggle.
-- Email-only registration and sign-in through Supabase Auth.
+- Email/password registration and sign-in through Supabase Auth; email verification remains enabled.
+- Required mobile phone number collected at registration and stored in Supabase Auth user metadata (`phone`); no SMS verification or phone-based sign-in.
 - Multiple submissions per participant account.
 - Required title, authors, scientific field, and **3–7 keywords** per submission.
 - Abstract and poster uploads (PDF, PNG, DOC, DOCX, PPT, PPTX; 10 MB maximum per file).

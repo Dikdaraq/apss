@@ -4,8 +4,8 @@
   const STORAGE_KEY = "apss-language";
   let language = localStorage.getItem(STORAGE_KEY) || "fa", mode = "register", client;
   const words = {
-    fa: {register:"ثبت‌نام", login:"ورود", createTitle:"ایجاد حساب کاربری", loginTitle:"ورود به حساب کاربری", createIntro:"برای آماده‌سازی و ارسال چکیده و پوستر، با ایمیل خود ثبت‌نام کنید.", loginIntro:"با نشانی ایمیلی که هنگام ثبت‌نام استفاده کرده‌اید وارد شوید.", createButton:"ایجاد حساب", loginButton:"ورود", creating:"در حال ایجاد حساب…", signing:"در حال ورود…", needDetails:"نام و نام خانوادگی و نام دانشگاه یا مؤسسه را وارد کنید.", setup:"تنظیمات لازم است: نشانی پروژه Supabase و کلید publishable را در فایل supabase-config.js وارد کنید.", noClient:"کتابخانه Supabase بارگذاری نشد. اتصال اینترنت را بررسی و صفحه را دوباره بارگذاری کنید.", configError:"پیکربندی Supabase بارگذاری نشد. فایل supabase-config.js را بررسی کنید.", created:"حساب ساخته شد و وارد شدید. پروفایل شما آماده است.", verify:"ثبت‌نام انجام شد. ایمیل خود را بررسی کنید و پیش از ورود، پیوند تأیید را باز کنید.", verified:"پیوند تأیید ایمیل باز شده است. اگر ایمیل تأیید شده، اکنون می‌توانید وارد شوید.", signed:"ورود با موفقیت انجام شد. بخش ارسال آثار در مرحله بعد فعال می‌شود.", failed:"مشکلی رخ داد. لطفاً دوباره تلاش کنید."},
-    en: {register:"Register", login:"Sign in", createTitle:"Create your account", loginTitle:"Sign in to your account", createIntro:"Register with your email to prepare your abstract and poster submission.", loginIntro:"Sign in with the email address you registered with.", createButton:"Create account", loginButton:"Sign in", creating:"Creating account…", signing:"Signing in…", needDetails:"Enter your full name and institution.", setup:"Setup required: add your Supabase Project URL and publishable key to supabase-config.js.", noClient:"The Supabase client could not load. Check your internet connection and reload this page.", configError:"Supabase configuration could not be loaded. Check supabase-config.js.", created:"Account created and signed in. Your profile is ready.", verify:"Registration started. Check your inbox and click the verification link before signing in.", verified:"Email verification link opened. You can now sign in if your email has been confirmed.", signed:"Signed in successfully. The submission dashboard is the next feature to be connected.", failed:"Something went wrong. Please try again."}
+    fa: {register:"ثبت‌نام", login:"ورود", createTitle:"ایجاد حساب کاربری", loginTitle:"ورود به حساب کاربری", createIntro:"برای ثبت‌نام، نام، دانشگاه، شماره تلفن همراه و ایمیل خود را وارد کنید. تأیید حساب از طریق ایمیل انجام می‌شود.", loginIntro:"با نشانی ایمیلی که هنگام ثبت‌نام استفاده کرده‌اید وارد شوید.", createButton:"ایجاد حساب", loginButton:"ورود", creating:"در حال ایجاد حساب…", signing:"در حال ورود…", needDetails:"نام، دانشگاه یا مؤسسه و شماره تلفن همراه را وارد کنید.", setup:"تنظیمات لازم است: نشانی پروژه Supabase و کلید publishable را در فایل supabase-config.js وارد کنید.", noClient:"کتابخانه Supabase بارگذاری نشد. اتصال اینترنت را بررسی و صفحه را دوباره بارگذاری کنید.", configError:"پیکربندی Supabase بارگذاری نشد. فایل supabase-config.js را بررسی کنید.", created:"حساب ساخته شد و وارد شدید. پروفایل شما آماده است.", verify:"ثبت‌نام انجام شد. ایمیل خود را بررسی کنید و پیش از ورود، پیوند تأیید را باز کنید.", verified:"پیوند تأیید ایمیل باز شده است. اگر ایمیل تأیید شده، اکنون می‌توانید وارد شوید.", signed:"ورود با موفقیت انجام شد. بخش ارسال آثار در مرحله بعد فعال می‌شود.", failed:"مشکلی رخ داد. لطفاً دوباره تلاش کنید."},
+    en: {register:"Register", login:"Sign in", createTitle:"Create your account", loginTitle:"Sign in to your account", createIntro:"Enter your name, institution, mobile number, and email to register. Account verification remains email-based.", loginIntro:"Sign in with the email address you registered with.", createButton:"Create account", loginButton:"Sign in", creating:"Creating account…", signing:"Signing in…", needDetails:"Enter your full name, institution, and phone number.", setup:"Setup required: add your Supabase Project URL and publishable key to supabase-config.js.", noClient:"The Supabase client could not load. Check your internet connection and reload this page.", configError:"Supabase configuration could not be loaded. Check supabase-config.js.", created:"Account created and signed in. Your profile is ready.", verify:"Registration started. Check your inbox and click the verification link before signing in.", verified:"Email verification link opened. You can now sign in if your email has been confirmed.", signed:"Signed in successfully. The submission dashboard is the next feature to be connected.", failed:"Something went wrong. Please try again."}
   };
   function showStatus(message, kind="success") { status.textContent=message; status.className=`auth-status show ${kind}`; }
   function clearStatus(){status.textContent="";status.className="auth-status";}
@@ -24,11 +24,12 @@
     registerTab.textContent=w.register; loginTab.textContent=w.login;
     $("pageTitle").textContent=registering?w.createTitle:w.loginTitle;
     $("pageIntro").textContent=registering?w.createIntro:w.loginIntro;
-    $("nameWrap").classList.toggle("hidden",!registering); $("institutionWrap").classList.toggle("hidden",!registering);
-    $("fullName").required=registering; $("institution").required=registering; $("password").autocomplete=registering?"new-password":"current-password";
+    $("nameWrap").classList.toggle("hidden",!registering); $("institutionWrap").classList.toggle("hidden",!registering); $("phoneWrap").classList.toggle("hidden",!registering);
+    $("fullName").required=registering; $("institution").required=registering; $("phone").required=registering; $("password").autocomplete=registering?"new-password":"current-password";
     $("submitButton").textContent=registering?w.createButton:w.loginButton;
     $("fullName").placeholder=language==="fa"?"نام کامل شما":"Your full name";
     $("institution").placeholder=language==="fa"?"نام دانشگاه یا مؤسسه":"Your institution";
+    $("phone").placeholder=language==="fa"?"مثلاً ‎+98912xxxxxxx":"e.g. +98912xxxxxxx";
     $("password").placeholder=language==="fa"?"حداقل ۸ نویسه":"At least 8 characters";
     if(clear) clearStatus();
   }
@@ -49,10 +50,11 @@
     const email=$("email").value.trim(), password=$("password").value;
     try {
       if(mode==="register") {
-        const fullName=$("fullName").value.trim(), institution=$("institution").value.trim();
-        if(!fullName||!institution) throw new Error(w.needDetails);
+        const fullName=$("fullName").value.trim(), institution=$("institution").value.trim(), phone=$("phone").value.trim();
+        if(!fullName||!institution||!phone) throw new Error(w.needDetails);
+        if(!/^[+0-9().\s-]{7,25}$/.test(phone)) throw new Error(language==="fa"?"شماره تلفن معتبر وارد کنید.":"Enter a valid phone number.");
         const emailRedirectTo=`${window.location.origin}${window.location.pathname}`;
-        const {data,error}=await client.auth.signUp({email,password,options:{emailRedirectTo,data:{full_name:fullName,institution}}});
+        const {data,error}=await client.auth.signUp({email,password,options:{emailRedirectTo,data:{full_name:fullName,institution,phone}}});
         if(error)throw error;
         if(data.session)showStatus(w.created);else{showStatus(w.verify);form.reset();}
       } else {const {error}=await client.auth.signInWithPassword({email,password});if(error)throw error;window.location.href="submissions.html";return;}

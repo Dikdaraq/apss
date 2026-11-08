@@ -13,7 +13,6 @@
       failed:'ثبت اثر ناموفق بود: ', invalid:'فایل چکیده الزامی است و فایل پوستر یا ارائه در صورت انتخاب باید PDF، PNG، DOC، DOCX، PPT یا PPTX و حداکثر ۱۰ مگابایت باشد.',
       badTitle:'عنوان، نام نویسندگان و محور علمی را کامل کنید.',
       badKeywords:'لطفاً بین ۳ تا ۷ کلیدواژه وارد کنید. کلیدواژه‌ها را با ویرگول یا در خط جداگانه بنویسید.',
-      badWorkType:'لطفاً نوع اثر را انتخاب کنید: پوستر یا ارائه.',
       status:{submitted:'ثبت‌شده',under_review:'در حال بررسی',revision_requested:'نیازمند اصلاح',accepted:'پذیرفته‌شده',rejected:'ردشده'},
       logout:'خروج انجام شد.', keywords:'کلیدواژه‌ها: '
     },
@@ -26,7 +25,6 @@
       invalid:'The abstract file is required. If provided, the optional poster or presentation must be PDF, PNG, DOC, DOCX, PPT, or PPTX and no larger than 10 MB.',
       badTitle:'Complete the title, authors, and scientific field.',
       badKeywords:'Enter 3–7 keywords, separated by commas or new lines.',
-      badWorkType:'Select at least one work type: Poster or Presentation.',
       status:{submitted:'Submitted',under_review:'Under review',revision_requested:'Revision requested',accepted:'Accepted',rejected:'Rejected'},
       logout:'You have signed out.', keywords:'Keywords: '
     }
@@ -127,12 +125,8 @@
       const title = $('title').value.trim(), authors = $('authors').value.trim(), field = $('field').value;
       const abstractFile = $('abstractFile').files[0], posterFile = $('posterFile').files[0] || null;
       const keywords = parseKeywords($('keywords').value);
-      const workTypes = [];
-      if ($('typePoster').checked) workTypes.push('Poster');
-      if ($('typePresentation').checked) workTypes.push('Presentation');
       if (!title || !authors || !field) { showStatus(words[language].badTitle, 'error'); return; }
       if (keywords.length < 3 || keywords.length > 7) { showStatus(words[language].badKeywords, 'error'); $('keywords').focus(); return; }
-      if (!workTypes.length) { showStatus(words[language].badWorkType, 'error'); $('typePoster').focus(); return; }
       if (!fileValid(abstractFile) || (posterFile && !fileValid(posterFile))) { showStatus(words[language].invalid, 'error'); return; }
 
       const btn = $('submitButton'); btn.disabled = true; showStatus(words[language].uploading);
@@ -152,7 +146,6 @@
           'APSS 9 — Submission keywords',
           `Title: ${title}`,
           `Authors: ${authors}`,
-          `Submission type: ${workTypes.join(', ')}`,
           '',
           ...keywords.map((keyword, i) => `${i + 1}. ${keyword}`),
           ''
